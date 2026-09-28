@@ -1,0 +1,58 @@
+name: "CI"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+          targets: wasm32-unknown-unknown
+      - name: cargo fmt -- --check
+        run: cargo fmt --all -- --check
+      - name: clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Run tests
+        run: cargo test --verbose
+      - name: Run tests (SSSE3 kernels)
+        run: cargo test --lib --target-dir target/ssse3
+        env:
+          RUSTFLAGS: --cfg encodify_no_avx2
+      - name: Run tests (portable fallbacks)
+        run: cargo test --lib --target-dir target/scalar
+        env:
+          RUSTFLAGS: --cfg encodify_scalar
+      - name: Build (wasm32)
+        run: cargo build --verbose --target wasm32-unknown-unknown
+
+  aarch64:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run tests
+        run: cargo test --verbose
+
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@1.89
+      - name: Build
+        run: cargo build --verbose

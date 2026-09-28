@@ -1,0 +1,7 @@
+/target
+/test
+.ignore
+.DS_Store
+perf.*
+*.svg
+Cargo.lock

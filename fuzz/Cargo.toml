@@ -1,0 +1,25 @@
+[package]
+name = "encodify-fuzz"
+version = "0.0.0"
+authors = ["Automatically generated"]
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.encodify]
+path = ".."
+
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "encodify"
+path = "fuzz_targets/encodify.rs"
+test = false
+doc = false
+bench = false

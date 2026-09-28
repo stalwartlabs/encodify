@@ -1,0 +1,46 @@
+[package]
+name = "encodify"
+description = "Fast Base64, Base32, Quoted-Printable, RFC 2047, UTF-7 and PEM encoding and decoding"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.89"
+authors = [ "Stalwart Labs LLC <hello@stalw.art>"]
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/stalwartlabs/encodify"
+homepage = "https://github.com/stalwartlabs/encodify"
+documentation = "https://docs.rs/encodify"
+keywords = ["base64", "base32", "quoted-printable", "mime", "email"]
+categories = ["encoding", "email"]
+readme = "README.md"
+exclude = ["/.github", "/benches", "/fuzz"]
+
+[dependencies]
+memchr = "2.7"
+simdutf8 = "0.1"
+
+[dev-dependencies]
+base32 = "0.5"
+base64 = "0.23"
+base64-simd = "0.8"
+base64-turbo = "0.5"
+criterion = "0.8"
+data-encoding = "2.11"
+fast32 = "1.0"
+quoted_printable = "0.5"
+simdutf = "0.7"
+
+[[bench]]
+name = "codec"
+harness = false
+
+[lints.rust]
+rust_2018_idioms = { level = "deny", priority = -1 }
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+undocumented_unsafe_blocks = "deny"
+unwrap_used = "deny"
+
+[profile.bench]
+debug = true
