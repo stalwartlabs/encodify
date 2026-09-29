@@ -16,7 +16,7 @@ use crate::{
         kernel::{Job, Kernel},
         words::Words,
     },
-    test_rng::XorShift,
+    test_rng::{XorShift, scaled},
 };
 use std::borrow::Cow;
 
@@ -65,7 +65,7 @@ impl Check for WordSamples {
 fn every_kernel_encodes_words() {
     let mut rng = XorShift::new(0x3a7d);
     let alphabet = b"abcdefghij KLMNOP0123456789!*+-/=?_;.:<>~\t";
-    let samples = (0..3_000)
+    let samples = (0..scaled(3_000))
         .map(|round| {
             let len = rng.lengths(round);
             match round % 3 {
@@ -81,7 +81,7 @@ fn every_kernel_encodes_words() {
 #[test]
 fn encodes_words_like_the_reference() {
     let mut rng = XorShift::new(0x9e70);
-    for round in 0..6_000 {
+    for round in 0..scaled(6_000) {
         let len = rng.lengths(round);
         let input = match round % 2 {
             0 => rng.raw_input(len),
@@ -172,7 +172,7 @@ fn encodes_every_byte_on_its_own() {
 #[test]
 fn decodes_q_like_the_reference() {
     let mut rng = XorShift::new(0x7707);
-    for round in 0..8_000 {
+    for round in 0..scaled(8_000) {
         let len = rng.lengths(round);
         let input = rng.qp_input(len);
         for engine in [Q_TEXT, Q_PHRASE] {
@@ -279,7 +279,7 @@ fn q_word_edge_cases() {
 #[test]
 fn decodes_dkim_like_the_reference() {
     let mut rng = XorShift::new(0xd41);
-    for round in 0..8_000 {
+    for round in 0..scaled(8_000) {
         let len = rng.lengths(round);
         let input = match round % 3 {
             0 => rng.qp_input(len),

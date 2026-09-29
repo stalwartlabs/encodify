@@ -512,7 +512,7 @@ mod tests {
     use crate::{
         Error,
         qp::tests::reference::{Digits, Failure, Hex},
-        test_rng::XorShift,
+        test_rng::{XorShift, scaled},
     };
     use std::borrow::Cow;
 
@@ -559,7 +559,7 @@ mod tests {
     fn matches_the_reference_on_random_input() {
         let mut rng = XorShift::new(0x4e58);
         let alphabet = b"%+=09afAFgG \x00\xff;.";
-        for round in 0..20_000 {
+        for round in 0..scaled(20_000) {
             let len = rng.below(if round % 16 == 0 { 300 } else { 24 });
             let input: Vec<u8> = match round % 2 {
                 0 => (0..len).map(|_| *rng.pick(alphabet)).collect(),

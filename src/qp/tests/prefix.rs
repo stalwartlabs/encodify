@@ -17,7 +17,7 @@ use crate::{
         kernel::{Job, Kernel},
         words::Words,
     },
-    test_rng::XorShift,
+    test_rng::{XorShift, scaled},
 };
 
 const ENGINES: [QuotedPrintable; 5] = [BODY, BINARY, Q_TEXT, Q_PHRASE, DKIM];
@@ -122,7 +122,7 @@ impl Check for Counts {
 #[test]
 fn every_kernel_counts_like_the_reference() {
     let mut rng = XorShift::new(0xc0de);
-    let mut samples: Vec<Vec<u8>> = (0..1_500)
+    let mut samples: Vec<Vec<u8>> = (0..scaled(1_500))
         .map(|round| {
             let len = rng.lengths(round);
             rng.raw_input(len)
@@ -203,7 +203,7 @@ impl Check for Prefixes {
 #[test]
 fn every_kernel_encodes_word_prefixes() {
     let mut rng = XorShift::new(0x9ef1);
-    let samples = (0..600)
+    let samples = (0..scaled(600))
         .map(|round| {
             let pieces = rng.below(if round % 5 == 0 { 40 } else { 12 });
             (rng.text(pieces), rng.below(90))
@@ -215,7 +215,7 @@ fn every_kernel_encodes_word_prefixes() {
 #[test]
 fn encode_prefix_takes_the_longest_fitting_prefix() {
     let mut rng = XorShift::new(0x51fe);
-    for round in 0..1_500 {
+    for round in 0..scaled(1_500) {
         let pieces = rng.below(if round % 7 == 0 { 30 } else { 10 });
         let text = rng.text(pieces);
         let budget = rng.below(if round % 3 == 0 { 400 } else { 60 });
@@ -270,7 +270,7 @@ fn word_engines_fold_between_escapes() {
         Fold::new(2, b"\r\n ", 1),
         Fold::new(3000, b"\r\n", 0),
     ] {
-        for round in 0..300 {
+        for round in 0..scaled(300) {
             let len = rng.lengths(round);
             let input = match round % 3 {
                 0 => rng.raw_input(len),
@@ -303,7 +303,7 @@ fn word_engines_fold_between_escapes() {
 #[test]
 fn line_engines_fold_with_soft_breaks() {
     let mut rng = XorShift::new(0xb0d1);
-    for round in 0..600 {
+    for round in 0..scaled(600) {
         let len = rng.lengths(round);
         let input = rng.raw_input(len);
         for (engine, encode) in [

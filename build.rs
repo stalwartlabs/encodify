@@ -19,7 +19,7 @@ fn main() {
     println!("cargo::rerun-if-changed=build.rs");
     let arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default();
     let features = env::var("CARGO_CFG_TARGET_FEATURE").unwrap_or_default();
-    let scalar = env::var_os("CARGO_CFG_encodify_SCALAR").is_some();
+    let scalar = env::var_os("CARGO_CFG_ENCODIFY_SCALAR").is_some();
     let has = |wanted: &str| features.split(',').any(|feature| feature == wanted);
     let neon = !scalar && arch == "aarch64" && has("neon");
     let x86 = !scalar && matches!(arch.as_str(), "x86" | "x86_64") && has("sse2");

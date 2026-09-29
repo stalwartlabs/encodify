@@ -217,7 +217,7 @@ mod tests {
     use crate::{
         Fold, base64,
         rfc2047::{decode_text, utf8_charset},
-        test_rng::XorShift,
+        test_rng::{XorShift, scaled},
     };
 
     const SAMPLES: [&str; 8] = [
@@ -275,7 +275,7 @@ mod tests {
     fn random_text_round_trips() {
         let mut rng = XorShift::new(51);
         let alphabet: Vec<char> = "aZ09 _=?\t.éßПр日本🦀".chars().collect();
-        for _ in 0..300 {
+        for _ in 0..scaled(300) {
             let len = rng.below(120);
             let text: String = (0..len).map(|_| *rng.pick(&alphabet)).collect();
             let text = text.trim().to_string();
@@ -356,7 +356,7 @@ mod tests {
     fn words_match_the_greedy_reference() {
         let mut rng = XorShift::new(52);
         let alphabet: Vec<char> = "aZ09 _=?\t.éßПр日本🦀".chars().collect();
-        for round in 0..600 {
+        for round in 0..scaled(600) {
             let len = rng.below(if round % 4 == 0 { 200 } else { 40 });
             let text: String = (0..len).map(|_| *rng.pick(&alphabet)).collect();
             for encoder in [B, Q_TEXT, Q_PHRASE] {

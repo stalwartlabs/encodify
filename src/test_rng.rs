@@ -34,3 +34,14 @@ impl XorShift {
         &items[self.below(items.len())]
     }
 }
+
+const MIRI_DIVISOR: usize = if cfg!(miri) { 64 } else { 1 };
+const LENGTH_STEP: usize = if cfg!(miri) { 11 } else { 1 };
+
+pub(crate) const fn scaled(count: usize) -> usize {
+    count.div_ceil(MIRI_DIVISOR)
+}
+
+pub(crate) fn lengths(end: usize) -> impl Iterator<Item = usize> {
+    (0..end).step_by(LENGTH_STEP)
+}

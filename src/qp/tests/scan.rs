@@ -8,7 +8,7 @@ use super::{Inputs, Shown};
 use crate::{
     Error,
     qp::{BINARY, BODY, DKIM, Q_PHRASE, Q_TEXT, QuotedPrintable},
-    test_rng::XorShift,
+    test_rng::{XorShift, scaled},
 };
 use std::borrow::Cow;
 
@@ -22,7 +22,7 @@ const ENGINES: [QuotedPrintable; 7] = [
     DKIM,
 ];
 const ALPHABET: &[u8] = b"=\r\n \tA3_?;z\x7f\xc3";
-const EXHAUSTIVE_LEN: u32 = 4;
+const EXHAUSTIVE_LEN: u32 = if cfg!(miri) { 3 } else { 4 };
 
 trait Scanned {
     fn check_scans(&self, engine: QuotedPrintable);
@@ -88,7 +88,7 @@ fn scans_agree_with_decoding_on_every_short_input() {
 #[test]
 fn scans_agree_with_decoding_on_random_input() {
     let mut rng = XorShift::new(0x5ca7);
-    for round in 0..3000 {
+    for round in 0..scaled(3000) {
         let len = rng.lengths(round);
         let input = match round % 2 {
             0 => rng.qp_input(len),

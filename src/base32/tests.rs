@@ -5,7 +5,10 @@
  */
 
 use super::{Alphabet, Base32, Padding, STALWART, STANDARD, STANDARD_NO_PAD};
-use crate::{Error, test_rng::XorShift};
+use crate::{
+    Error,
+    test_rng::{XorShift, lengths, scaled},
+};
 use std::{
     collections::hash_map::DefaultHasher,
     hash::{Hash, Hasher},
@@ -254,7 +257,8 @@ fn stalwart_id_golden_vectors() {
 #[test]
 fn u64_numerals_round_trip() {
     let mut rng = XorShift::new(11);
-    let random = (0..20_000u32).map(|round| rng.next().checked_shr(round % 65).unwrap_or(0));
+    let random =
+        (0..scaled(20_000) as u32).map(|round| rng.next().checked_shr(round % 65).unwrap_or(0));
     let values: Vec<u64> = (0..64)
         .flat_map(|bits| [(1u64 << bits) - 1, 1 << bits, (1 << bits) + 1])
         .chain([u64::MAX - 1, u64::MAX])
@@ -350,7 +354,7 @@ fn u64_numerals_reject_invalid_text() {
         })
     );
     let mut rng = XorShift::new(12);
-    for _ in 0..20_000 {
+    for _ in 0..scaled(20_000) {
         let len = rng.below(16);
         let text: Vec<u8> = (0..len)
             .map(|_| *rng.pick(b"abcdefghijklmnopqrstuvwxyz792013AZ4=\x00\xff"))
@@ -398,7 +402,7 @@ fn u64_text_behaves_like_str() {
 #[test]
 fn encodes_and_decodes_every_length_through_every_sink() {
     let mut rng = XorShift::new(13);
-    for len in 0..200 {
+    for len in lengths(200) {
         let input = rng.bytes(len);
         for engine in ENGINES {
             let expected = engine.reference_encode(&input);
@@ -516,7 +520,7 @@ fn large_inputs_use_the_bulk_kernels() {
 fn strict_decoding_matches_the_reference() {
     let mut rng = XorShift::new(15);
     let noise = b"=AZaz2790!\r\n \x00\xffMmYy";
-    for round in 0..30_000 {
+    for round in 0..scaled(30_000) {
         let len = rng.below(if round % 10 == 0 { 300 } else { 30 });
         let input = rng.bytes(len);
         for engine in ENGINES {
@@ -664,7 +668,7 @@ fn stream_decoder_stops_at_the_first_non_symbol() {
 #[test]
 fn stream_decoder_reports_the_remaining_input_while_reading() {
     let mut rng = XorShift::new(16);
-    for _ in 0..2_000 {
+    for _ in 0..scaled(2_000) {
         let len = rng.below(40);
         let input = rng.bytes(len);
         let encoded = STALWART.encode(&input);

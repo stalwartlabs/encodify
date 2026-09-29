@@ -9,7 +9,10 @@ use super::{
     URL_SAFE_NO_PAD,
     alphabet::{self, INVALID},
 };
-use crate::{Error, test_rng::XorShift};
+use crate::{
+    Error,
+    test_rng::{XorShift, lengths, scaled},
+};
 use ::base64::{
     Engine as _,
     engine::{DecodePaddingMode, GeneralPurpose, GeneralPurposeConfig},
@@ -86,7 +89,7 @@ const STRICT_ENGINES: [Base64; 6] = [
 #[test]
 fn encodes_like_the_base64_crate_for_every_length() {
     let mut rng = XorShift::new(1);
-    for len in 0..700 {
+    for len in lengths(700) {
         let input = rng.bytes(len);
         for engine in STRICT_ENGINES {
             let expected = reference_engine(&engine).encode(&input);
@@ -150,7 +153,7 @@ fn wraps_lines_with_the_requested_width_and_ending() {
         (72, LineEnding::CrLf, "\r\n"),
     ] {
         let engine = STANDARD.wrapped(width, ending);
-        for len in 0..400 {
+        for len in lengths(400) {
             let input = rng.bytes(len);
             let expected = reference_wrapped(&STANDARD.encode(&input), width, text);
             assert_eq!(engine.encode(&input), expected, "{width} {len}");
@@ -163,7 +166,7 @@ fn wraps_lines_with_the_requested_width_and_ending() {
 fn decodes_strict_engines_like_the_base64_crate() {
     let mut rng = XorShift::new(4);
     let noise = b"=\r\n \t-_+/.\x00\xffA";
-    for round in 0..40_000 {
+    for round in 0..scaled(40_000) {
         let len = rng.below(if round % 10 == 0 { 400 } else { 40 });
         let input = rng.bytes(len);
         for engine in STRICT_ENGINES {
@@ -317,7 +320,7 @@ fn lenient_samples(rng: &mut XorShift, count: usize) -> Vec<Vec<u8>> {
 #[test]
 fn lenient_decoding_follows_the_reference_rules() {
     let mut rng = XorShift::new(5);
-    for text in lenient_samples(&mut rng, 20_000) {
+    for text in lenient_samples(&mut rng, scaled(20_000)) {
         let expected = reference_lenient(&LENIENT, &text);
         let actual = LENIENT.decode(&text);
         match (&expected, &actual) {
@@ -381,7 +384,7 @@ fn lenient_decoding_edge_cases() {
 fn slice_decoding_stays_within_its_output() {
     const SENTINEL: u8 = 0xa5;
     let mut rng = XorShift::new(47);
-    for len in (0..300).chain([1000, 4096, 4099]) {
+    for len in lengths(300).chain([1000, 4096, 4099]) {
         let data = rng.bytes(len);
         for engine in [STANDARD, URL_SAFE_NO_PAD, MIME, LENIENT] {
             let text = engine.encode(&data);
@@ -575,7 +578,7 @@ fn const_encoding_matches_runtime_encoding() {
         URL_SAFE_NO_PAD.encode_const(&[0xfb, 0xff, 0xbf, 0xff]);
     assert_eq!(&NO_PAD, b"-_-__w");
     let mut rng = XorShift::new(7);
-    for len in 0..200 {
+    for len in lengths(200) {
         let input = rng.bytes(len);
         let wrapped = MIME.encode(&input);
         let mut out = vec![0u8; wrapped.len()];
@@ -781,7 +784,7 @@ fn folded_values_reject_what_the_reference_rejects() {
     let mut rng = XorShift::new(42);
     let raw = rng.bytes(2000);
     let clean = folded_value(&mut rng, &raw, 58, 74, b"\r\n ");
-    for _ in 0..500 {
+    for _ in 0..scaled(500) {
         let mut input = clean.clone();
         let position = rng.below(input.len());
         input[position] = *rng.pick(b"=\r\n \t*:-_.A0\x00\xff");

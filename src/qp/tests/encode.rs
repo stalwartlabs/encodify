@@ -17,7 +17,7 @@ use crate::{
         encode::Lines,
         kernel::{Job, Kernel},
     },
-    test_rng::XorShift,
+    test_rng::{XorShift, lengths, scaled},
 };
 
 const MIN_ROOM: usize = 6;
@@ -108,7 +108,7 @@ impl Check for Samples {
 #[test]
 fn every_kernel_encodes_like_the_reference() {
     let mut rng = XorShift::new(0xe4c0);
-    let samples = (0..3_000)
+    let samples = (0..scaled(3_000))
         .map(|round| {
             let len = rng.lengths(round);
             rng.raw_input(len)
@@ -120,7 +120,7 @@ fn every_kernel_encodes_like_the_reference() {
 #[test]
 fn every_kernel_handles_line_boundaries() {
     let mut samples = Vec::new();
-    for len in 0..160 {
+    for len in lengths(160) {
         for tail in [
             &b""[..],
             b" ",
@@ -170,7 +170,7 @@ impl Decoded for QuotedPrintable {
 #[test]
 fn encodes_through_every_sink() {
     let mut rng = XorShift::new(0x51c4);
-    for round in 0..2_000 {
+    for round in 0..scaled(2_000) {
         let len = rng.lengths(round);
         let input = rng.raw_input(len);
         for (engine, expected) in [

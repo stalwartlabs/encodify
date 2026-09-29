@@ -167,7 +167,7 @@ impl Tables {
 #[cfg(test)]
 mod tests {
     use super::super::alphabet::{STALWART, STANDARD, Tables};
-    use crate::test_rng::XorShift;
+    use crate::test_rng::{XorShift, lengths, scaled};
     use std::mem::MaybeUninit;
 
     type Groups = fn(&Tables, &[u8], &mut [MaybeUninit<u8>]) -> (usize, usize);
@@ -230,7 +230,7 @@ mod tests {
         let mut rng = XorShift::new(21);
         let levels = Level::available();
         let scalar = Kernel(Tables::encode_groups_scalar);
-        for len in (0..400).chain([1024, 4095, 4096, 4097, 20_000]) {
+        for len in lengths(400).chain([1024, 4095, 4096, 4097, 20_000]) {
             let input = rng.bytes(len);
             for tables in [&STANDARD, &STALWART] {
                 let (_, encoded) = scalar.run(tables, &input, len * 2);
@@ -267,7 +267,7 @@ mod tests {
         let values: Vec<u64> = (0..64)
             .flat_map(|bits| [(1u64 << bits) - 1, 1 << bits])
             .chain([u64::MAX])
-            .chain((0..5000).map(|_| rng.next() >> rng.below(64)))
+            .chain((0..scaled(5000)).map(|_| rng.next() >> rng.below(64)))
             .collect();
         for tables in [&STANDARD, &STALWART] {
             for &value in &values {
@@ -288,7 +288,7 @@ mod tests {
                 assert_eq!(tables.parse_numeral(text), Some(value), "{value}");
                 assert_eq!(tables.parse_numeral_scalar(text), Some(value));
             }
-            for _ in 0..20_000 {
+            for _ in 0..scaled(20_000) {
                 let len = rng.below(16);
                 let text: Vec<u8> = (0..len)
                     .map(|_| {

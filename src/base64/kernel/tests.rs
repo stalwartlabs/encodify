@@ -10,7 +10,7 @@ use crate::{
         LineEnding, Wrap,
         alphabet::{self, Tables},
     },
-    test_rng::XorShift,
+    test_rng::{XorShift, lengths},
 };
 use std::mem::MaybeUninit;
 
@@ -162,7 +162,7 @@ const ALL_TABLES: [&Tables; 4] = [
 fn decode_kernels_agree_with_scalar() {
     let mut rng = XorShift::new(21);
     for tables in ALL_TABLES {
-        for len in (0..300).chain([511, 512, 513, 4096, 4099]) {
+        for len in lengths(300).chain([511, 512, 513, 4096, 4099]) {
             let text: Vec<u8> = (0..len).map(|_| *rng.pick(&tables.encode)).collect();
             for room in [len / 4 * 3, len / 4 * 3 + 7, len] {
                 let (expected, expected_bytes) =
@@ -332,7 +332,7 @@ fn line_kernels_decode_whole_lines_only() {
 fn encode_kernels_agree_with_scalar() {
     let mut rng = XorShift::new(24);
     for tables in ALL_TABLES {
-        for len in (0..300).chain([511, 512, 513, 4096, 4099]) {
+        for len in lengths(300).chain([511, 512, 513, 4096, 4099]) {
             let input = rng.bytes(len);
             for room in [len / 3 * 4, len / 3 * 4 + 5, len * 2] {
                 let (expected, expected_bytes) =

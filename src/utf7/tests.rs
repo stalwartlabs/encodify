@@ -5,7 +5,10 @@
  */
 
 use super::{IMAP, MAIL, Utf7};
-use crate::{Error, test_rng::XorShift};
+use crate::{
+    Error,
+    test_rng::{XorShift, scaled},
+};
 
 #[test]
 fn lossy_decoding_follows_the_engine_syntax() {
@@ -179,7 +182,7 @@ fn imap_lenient_matches_imap_proto_without_truncation() {
 fn identity_check_matches_the_byte_classes() {
     let mut rng = XorShift::new(7);
     for len in 0..40 {
-        for _ in 0..200 {
+        for _ in 0..scaled(200) {
             let mut bytes: Vec<u8> = (0..len).map(|_| b' ' + rng.below(95) as u8).collect();
             if len > 0 && rng.below(2) == 0 {
                 let at = rng.below(len);

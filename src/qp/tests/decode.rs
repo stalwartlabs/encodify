@@ -16,7 +16,7 @@ use crate::{
         decode::Body,
         kernel::{Job, Kernel},
     },
-    test_rng::XorShift,
+    test_rng::{XorShift, lengths, scaled},
 };
 
 struct Samples(Vec<Vec<u8>>);
@@ -60,7 +60,7 @@ impl Check for Samples {
 #[test]
 fn every_kernel_decodes_like_the_reference() {
     let mut rng = XorShift::new(0x5157);
-    let samples = (0..6_000)
+    let samples = (0..scaled(6_000))
         .map(|round| {
             let len = rng.lengths(round);
             rng.qp_input(len)
@@ -72,7 +72,7 @@ fn every_kernel_decodes_like_the_reference() {
 #[test]
 fn every_kernel_handles_block_boundaries() {
     let mut samples = Vec::new();
-    for len in 0..70 {
+    for len in lengths(70) {
         for special in [
             &b"="[..],
             b"=\r\n",
@@ -97,7 +97,7 @@ fn every_kernel_handles_block_boundaries() {
 #[test]
 fn decodes_through_every_sink() {
     let mut rng = XorShift::new(0xdec0);
-    for round in 0..4_000 {
+    for round in 0..scaled(4_000) {
         let len = rng.lengths(round);
         let input = rng.qp_input(len);
         for engine in [BODY, BINARY, BODY.strict()] {
