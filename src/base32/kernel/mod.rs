@@ -120,7 +120,11 @@ impl Tables {
         }
         #[cfg(encodify_x86)]
         {
-            if std::is_x86_feature_detected!("ssse3") {
+            if cfg!(not(encodify_no_avx2)) && std::is_x86_feature_detected!("avx2") {
+                // SAFETY: AVX2 was detected at runtime just above; the kernel
+                // bounds its loads and stores by the slices.
+                unsafe { self.encode_groups_avx2(src, dst) }
+            } else if std::is_x86_feature_detected!("ssse3") {
                 // SAFETY: SSSE3 was detected at runtime just above; the kernel
                 // bounds its loads and stores by the slices.
                 unsafe { self.encode_groups_ssse3(src, dst) }
@@ -148,7 +152,11 @@ impl Tables {
         }
         #[cfg(encodify_x86)]
         {
-            if std::is_x86_feature_detected!("ssse3") {
+            if cfg!(not(encodify_no_avx2)) && std::is_x86_feature_detected!("avx2") {
+                // SAFETY: AVX2 was detected at runtime just above; the kernel
+                // bounds its loads and stores by the slices.
+                unsafe { self.decode_groups_avx2(src, dst) }
+            } else if std::is_x86_feature_detected!("ssse3") {
                 // SAFETY: SSSE3 was detected at runtime just above; the kernel
                 // bounds its loads and stores by the slices.
                 unsafe { self.decode_groups_ssse3(src, dst) }
@@ -207,6 +215,20 @@ mod tests {
                 // SAFETY: the `encodify_neon` cfg guarantees NEON at compile time.
                 decode: Kernel(|tables, src, dst| unsafe { tables.decode_groups_neon(src, dst) }),
             });
+            #[cfg(encodify_x86)]
+            if std::is_x86_feature_detected!("avx2") {
+                levels.push(Level {
+                    name: "avx2",
+                    // SAFETY: AVX2 was detected at runtime before this level is listed.
+                    encode: Kernel(|tables, src, dst| unsafe {
+                        tables.encode_groups_avx2(src, dst)
+                    }),
+                    // SAFETY: AVX2 was detected at runtime before this level is listed.
+                    decode: Kernel(|tables, src, dst| unsafe {
+                        tables.decode_groups_avx2(src, dst)
+                    }),
+                });
+            }
             #[cfg(encodify_x86)]
             if std::is_x86_feature_detected!("ssse3") {
                 levels.push(Level {

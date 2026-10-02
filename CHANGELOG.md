@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2026-10-02
+
+### Added
+- AVX2 base32 kernel.
+
+### Changed
+
+### Fixed
+
 ## [1.0.1] - 2026-09-29
 
 ### Fixed
