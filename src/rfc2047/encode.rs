@@ -232,7 +232,7 @@ mod tests {
     ];
 
     fn check(encoder: WordEncoder, text: &str, start: usize, fold: Fold<'_>) {
-        let mut out = String::from_iter(std::iter::repeat_n('x', start));
+        let mut out = String::from_iter(core::iter::repeat_n('x', start));
         let mut column = start;
         let appended = encoder.encode_words("utf-8", text, &mut column, fold, &mut out);
         assert_eq!(appended, out.len() - start, "{text}");
@@ -320,7 +320,7 @@ mod tests {
             let room = fold.width.saturating_sub(*column).min(MAX_WORD_LEN);
             let mut taken = prefix_len(rest, room.saturating_sub(overhead));
             if taken == 0 && *column > fold.indent {
-                out.push_str(std::str::from_utf8(fold.separator).unwrap_or_default());
+                out.push_str(core::str::from_utf8(fold.separator).unwrap_or_default());
                 *column = fold.indent;
                 continue;
             }
@@ -345,7 +345,7 @@ mod tests {
                 out.push(' ');
                 *column += 1;
             } else {
-                out.push_str(std::str::from_utf8(fold.separator).unwrap_or_default());
+                out.push_str(core::str::from_utf8(fold.separator).unwrap_or_default());
                 *column = fold.indent;
             }
         }

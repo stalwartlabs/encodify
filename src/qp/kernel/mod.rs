@@ -14,7 +14,7 @@ pub(crate) mod x86;
 
 use super::tables::WordClass;
 use crate::hex::EscapeTable;
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 #[cfg(encodify_simd)]
 const PLAIN_PROLOGUE: usize = 3;
@@ -95,8 +95,8 @@ pub(crate) trait Job: Sized {
         }
         #[cfg(encodify_x86)]
         {
-            if cfg!(not(encodify_no_avx2)) && std::is_x86_feature_detected!("avx2") {
-                // SAFETY: AVX2 was detected at runtime in the condition just above.
+            if crate::cpu::avx2() {
+                // SAFETY: AVX2 was checked in the condition just above.
                 unsafe { x86::Avx2::run(self) }
             } else {
                 self.run::<x86::Sse2>()

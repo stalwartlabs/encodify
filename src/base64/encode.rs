@@ -11,8 +11,12 @@ use crate::{
     Buffer, Error,
     buffer::{Initialized, Uninit},
 };
-use std::{io, mem::MaybeUninit};
+use alloc::string::String;
+use core::mem::MaybeUninit;
+#[cfg(feature = "std")]
+use std::io;
 
+#[cfg(feature = "std")]
 const WRITER_BUFFER: usize = 4096;
 
 impl Base64 {
@@ -49,11 +53,12 @@ impl Base64 {
         debug_assert!(text.is_ascii());
         // SAFETY: `encode_into_slice` checked `out` holds the whole encoding, so
         // its first `written` bytes are alphabet symbols, `=` or CR/LF (ASCII).
-        Ok(unsafe { std::str::from_utf8_unchecked(text) })
+        Ok(unsafe { core::str::from_utf8_unchecked(text) })
     }
 
     /// Writes the encoding of `input` to `writer` in chunks, without
     /// allocating.
+    #[cfg(feature = "std")]
     pub fn encode_to_writer(
         &self,
         input: impl AsRef<[u8]>,

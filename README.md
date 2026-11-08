@@ -40,6 +40,7 @@ _encodify_ is a fast **Base64, Base32, Quoted-Printable, RFC 2047, UTF-7 and PEM
 - **PEM**: armored blocks with labels, headers and checksums.
 - **Performance and safety**:
   - SIMD kernels for NEON (aarch64) and SSSE3/AVX2 (x86 and x86_64, detected at runtime), with fast portable fallbacks on every other target, including 32-bit ARM, RISC-V and `wasm32`.
+  - `no_std` with `alloc` when the default `std` feature is off.
   - Output appended to caller-owned buffers or written into slices, without zero-filling or hidden reallocations.
   - Two dependencies: [memchr](https://crates.io/crates/memchr) and [simdutf8](https://crates.io/crates/simdutf8).
 

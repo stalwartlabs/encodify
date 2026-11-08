@@ -17,7 +17,7 @@ use super::{
 use core::arch::x86::*;
 #[cfg(target_arch = "x86_64")]
 use core::arch::x86_64::*;
-use std::{array, hint::black_box, mem::MaybeUninit};
+use core::{array, hint::black_box, mem::MaybeUninit};
 
 const PACK_LANE: [i8; 16] = [2, 1, 0, 6, 5, 4, 10, 9, 8, 14, 13, 12, -1, -1, -1, -1];
 const SPREAD_LANE: [i8; 16] = [1, 0, 2, 1, 4, 3, 5, 4, 7, 6, 8, 7, 10, 9, 11, 10];

@@ -9,7 +9,7 @@ use super::{
     Kernel, LineMasks,
 };
 use crate::hex::{EscapeTable, decode_pair};
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 pub(crate) const WORD: usize = 8;
 const ESCAPE: usize = 3;

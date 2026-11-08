@@ -19,7 +19,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
-          targets: wasm32-unknown-unknown
+          targets: wasm32-unknown-unknown, thumbv7em-none-eabihf, riscv32imac-unknown-none-elf, aarch64-unknown-none
       - name: cargo fmt -- --check
         run: cargo fmt --all -- --check
       - name: clippy
@@ -36,6 +36,16 @@ jobs:
           RUSTFLAGS: --cfg encodify_scalar
       - name: Build (wasm32)
         run: cargo build --verbose --target wasm32-unknown-unknown
+      - name: clippy (no_std)
+        run: cargo clippy --lib --tests --no-default-features -- -D warnings
+      - name: Run tests (no_std)
+        run: cargo test --no-default-features --target-dir target/no-std
+      - name: Build (no_std, thumbv7em-none-eabihf)
+        run: cargo build --verbose --no-default-features --target thumbv7em-none-eabihf
+      - name: Build (no_std, riscv32imac-unknown-none-elf)
+        run: cargo build --verbose --no-default-features --target riscv32imac-unknown-none-elf
+      - name: Build (no_std, aarch64-unknown-none)
+        run: cargo build --verbose --no-default-features --target aarch64-unknown-none
 
   aarch64:
     runs-on: macos-latest

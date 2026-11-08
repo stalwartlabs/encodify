@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  */
 
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 pub(super) trait Output {
     fn put<const N: usize>(&mut self, at: usize, bytes: [u8; N]);

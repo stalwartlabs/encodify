@@ -7,7 +7,7 @@
 #![allow(unsafe_code)]
 
 use super::Base64;
-use std::{
+use core::{
     fmt::{self, Alignment, Write},
     mem::MaybeUninit,
 };
@@ -54,7 +54,7 @@ impl fmt::Display for Display<'_> {
             debug_assert!(text.is_ascii());
             // SAFETY: pieces hold only alphabet symbols, `=` and CR/LF, and any
             // prefix of ASCII is valid UTF-8.
-            f.write_str(unsafe { std::str::from_utf8_unchecked(text) })
+            f.write_str(unsafe { core::str::from_utf8_unchecked(text) })
                 .map_err(Some)?;
             left -= text.len();
             if left == 0 { Err(None) } else { Ok(()) }

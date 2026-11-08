@@ -16,7 +16,7 @@ use crate::{
     Buffer,
     hex::{BLOCK_ROOM, EscapeTable},
 };
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 const SLACK: usize = 64;
 

@@ -11,7 +11,7 @@ use super::{
     encode::{GROUP, GROUP_SYMBOLS},
 };
 use crate::buffer::Initialized;
-use std::{
+use core::{
     fmt::{self, Alignment, Write},
     mem::MaybeUninit,
 };
@@ -64,7 +64,7 @@ impl fmt::Display for Display<'_> {
             debug_assert!(text.is_ascii());
             // SAFETY: the encoder writes only alphabet symbols and `=`, which
             // are ASCII and so valid UTF-8.
-            f.write_str(unsafe { std::str::from_utf8_unchecked(text) })?;
+            f.write_str(unsafe { core::str::from_utf8_unchecked(text) })?;
             left -= text.len();
         }
         for _ in 0..after {

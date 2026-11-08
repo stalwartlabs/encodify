@@ -13,7 +13,7 @@ pub(crate) mod scalar;
 mod x86;
 
 use super::alphabet::Tables;
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 const SIMD_MIN_INPUT: usize = 16;
 
@@ -120,12 +120,12 @@ impl Tables {
         }
         #[cfg(encodify_x86)]
         {
-            if cfg!(not(encodify_no_avx2)) && std::is_x86_feature_detected!("avx2") {
-                // SAFETY: AVX2 was detected at runtime just above; the kernel
+            if crate::cpu::avx2() {
+                // SAFETY: AVX2 was checked just above; the kernel
                 // bounds its loads and stores by the slices.
                 unsafe { self.encode_groups_avx2(src, dst) }
-            } else if std::is_x86_feature_detected!("ssse3") {
-                // SAFETY: SSSE3 was detected at runtime just above; the kernel
+            } else if crate::cpu::ssse3() {
+                // SAFETY: SSSE3 was checked just above; the kernel
                 // bounds its loads and stores by the slices.
                 unsafe { self.encode_groups_ssse3(src, dst) }
             } else {
@@ -152,12 +152,12 @@ impl Tables {
         }
         #[cfg(encodify_x86)]
         {
-            if cfg!(not(encodify_no_avx2)) && std::is_x86_feature_detected!("avx2") {
-                // SAFETY: AVX2 was detected at runtime just above; the kernel
+            if crate::cpu::avx2() {
+                // SAFETY: AVX2 was checked just above; the kernel
                 // bounds its loads and stores by the slices.
                 unsafe { self.decode_groups_avx2(src, dst) }
-            } else if std::is_x86_feature_detected!("ssse3") {
-                // SAFETY: SSSE3 was detected at runtime just above; the kernel
+            } else if crate::cpu::ssse3() {
+                // SAFETY: SSSE3 was checked just above; the kernel
                 // bounds its loads and stores by the slices.
                 unsafe { self.decode_groups_ssse3(src, dst) }
             } else {
@@ -176,7 +176,7 @@ impl Tables {
 mod tests {
     use super::super::alphabet::{STALWART, STANDARD, Tables};
     use crate::test_rng::{XorShift, lengths, scaled};
-    use std::mem::MaybeUninit;
+    use core::mem::MaybeUninit;
 
     type Groups = fn(&Tables, &[u8], &mut [MaybeUninit<u8>]) -> (usize, usize);
 

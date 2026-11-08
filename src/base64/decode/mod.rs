@@ -24,8 +24,9 @@ use crate::{
     buffer::{SpareCapacity, Uninit},
     error::ToStr,
 };
+use alloc::{string::String, vec::Vec};
+use core::mem::MaybeUninit;
 use lenient::{Halt, Lenient};
-use std::mem::MaybeUninit;
 use strict::Layout;
 
 const CHUNK: usize = 4096;

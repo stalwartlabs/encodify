@@ -21,7 +21,7 @@ use super::{
     LineEnding, Wrap,
     alphabet::{INVALID, Tables},
 };
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 #[derive(Clone, Copy)]
 #[cfg_attr(not(encodify_simd), allow(dead_code))]
@@ -226,12 +226,12 @@ impl Tables {
         #[cfg(encodify_x86)]
         {
             let nibbles = self.nibbles.as_ref()?;
-            if cfg!(not(encodify_no_avx2)) && std::is_x86_feature_detected!("avx2") {
-                // SAFETY: AVX2 was detected at runtime just above; the kernel
+            if crate::cpu::avx2() {
+                // SAFETY: AVX2 was checked just above; the kernel
                 // takes bounds-checked slices and has no other precondition.
                 unsafe { nibbles.decode_quads_avx2(src, dst) }
-            } else if std::is_x86_feature_detected!("ssse3") {
-                // SAFETY: SSSE3 was detected at runtime just above; the kernel
+            } else if crate::cpu::ssse3() {
+                // SAFETY: SSSE3 was checked just above; the kernel
                 // takes bounds-checked slices and has no other precondition.
                 unsafe { nibbles.decode_quads_ssse3(src, dst) }
             } else {
@@ -253,12 +253,12 @@ impl Tables {
         }
         #[cfg(encodify_x86)]
         {
-            if cfg!(not(encodify_no_avx2)) && std::is_x86_feature_detected!("avx2") {
-                // SAFETY: AVX2 was detected at runtime just above; the kernel
+            if crate::cpu::avx2() {
+                // SAFETY: AVX2 was checked just above; the kernel
                 // takes bounds-checked slices and has no other precondition.
                 unsafe { self.encode_groups_avx2(src, dst) }
-            } else if std::is_x86_feature_detected!("ssse3") {
-                // SAFETY: SSSE3 was detected at runtime just above; the kernel
+            } else if crate::cpu::ssse3() {
+                // SAFETY: SSSE3 was checked just above; the kernel
                 // takes bounds-checked slices and has no other precondition.
                 unsafe { self.encode_groups_ssse3(src, dst) }
             } else {
@@ -325,12 +325,12 @@ impl Tables {
             let Some(nibbles) = &self.nibbles else {
                 return (0, 0);
             };
-            if cfg!(not(encodify_no_avx2)) && std::is_x86_feature_detected!("avx2") {
-                // SAFETY: AVX2 was detected at runtime just above; the kernel
+            if crate::cpu::avx2() {
+                // SAFETY: AVX2 was checked just above; the kernel
                 // takes bounds-checked slices and has no other precondition.
                 unsafe { nibbles.decode_lines_avx2(shape, src, dst) }
-            } else if std::is_x86_feature_detected!("ssse3") {
-                // SAFETY: SSSE3 was detected at runtime just above; the kernel
+            } else if crate::cpu::ssse3() {
+                // SAFETY: SSSE3 was checked just above; the kernel
                 // takes bounds-checked slices and has no other precondition.
                 unsafe { nibbles.decode_lines_ssse3(shape, src, dst) }
             } else {
@@ -407,12 +407,12 @@ impl Tables {
         }
         #[cfg(encodify_x86)]
         {
-            if cfg!(not(encodify_no_avx2)) && std::is_x86_feature_detected!("avx2") {
-                // SAFETY: AVX2 was detected at runtime just above;
+            if crate::cpu::avx2() {
+                // SAFETY: AVX2 was checked just above;
                 // `Base64::wrapped` rounds `wrap.width` to a multiple of 4 (asserted above).
                 unsafe { self.encode_lines_avx2(wrap, src, dst) }
-            } else if std::is_x86_feature_detected!("ssse3") {
-                // SAFETY: SSSE3 was detected at runtime just above;
+            } else if crate::cpu::ssse3() {
+                // SAFETY: SSSE3 was checked just above;
                 // `Base64::wrapped` rounds `wrap.width` to a multiple of 4 (asserted above).
                 unsafe { self.encode_lines_ssse3(wrap, src, dst) }
             } else {

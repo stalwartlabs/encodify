@@ -9,11 +9,10 @@ use crate::{
     Error,
     test_rng::{XorShift, lengths, scaled},
 };
-use std::{
-    collections::hash_map::DefaultHasher,
-    hash::{Hash, Hasher},
-    io::Write,
-};
+use core::hash::{Hash, Hasher};
+use std::collections::hash_map::DefaultHasher;
+#[cfg(feature = "std")]
+use std::io::Write;
 
 const ENGINES: [Base32; 6] = [
     STANDARD,
@@ -282,7 +281,7 @@ fn u64_numerals_round_trip() {
                 "{engine:?} {expected}"
             );
             let zero = engine.symbols()[0] as char;
-            let padded: String = std::iter::repeat_n(zero, 13 - expected.len())
+            let padded: String = core::iter::repeat_n(zero, 13 - expected.len())
                 .chain(expected.chars())
                 .collect();
             assert_eq!(engine.decode_u64(&padded), Ok(value), "{padded}");
@@ -467,10 +466,10 @@ fn encodes_and_decodes_every_length_through_every_sink() {
             let mut rest = &input[..];
             while !rest.is_empty() {
                 let (piece, tail) = rest.split_at(1 + rng.below(rest.len().min(12)));
-                if rng.below(2) == 0 {
-                    encoder.push(piece);
-                } else {
-                    encoder.write_all(piece).expect("in-memory encoder");
+                match rng.below(2) {
+                    #[cfg(feature = "std")]
+                    1 => encoder.write_all(piece).expect("in-memory encoder"),
+                    _ => encoder.push(piece),
                 }
                 rest = tail;
             }
@@ -702,14 +701,18 @@ fn stream_encoder_flushes_on_drop_and_keeps_the_prefix() {
     assert_eq!(out, "smfrgg");
 
     let mut out = Vec::new();
+    STANDARD.encoder(&mut out).finish();
+    assert!(out.is_empty());
+}
+
+#[cfg(feature = "std")]
+#[test]
+fn stream_encoder_writes_through_io_write() {
+    let mut out = Vec::new();
     let mut encoder = STANDARD.encoder(&mut out);
     assert_eq!(encoder.write(b"foob").ok(), Some(4));
     assert!(encoder.flush().is_ok());
     encoder.push(b"ar");
     encoder.finish();
     assert_eq!(out, b"MZXW6YTBOI======");
-
-    let mut out = Vec::new();
-    STANDARD.encoder(&mut out).finish();
-    assert!(out.is_empty());
 }

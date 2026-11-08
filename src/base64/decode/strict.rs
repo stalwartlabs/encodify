@@ -12,7 +12,7 @@ use crate::{
         alphabet::{INVALID, Tables},
     },
 };
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 const SEXTET_OVERFLOW: u8 = 0xc0;
 

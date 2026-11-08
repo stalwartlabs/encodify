@@ -11,8 +11,9 @@ use crate::{
     buffer::sealed::Sealed,
     error::ToStr,
 };
+use alloc::{string::String, vec::Vec};
+use core::slice;
 use memchr::memchr;
-use std::slice;
 
 impl Utf7 {
     pub(super) fn decodes_to_itself(&self, bytes: &[u8]) -> bool {

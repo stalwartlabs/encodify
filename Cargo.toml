@@ -14,9 +14,13 @@ categories = ["encoding", "email"]
 readme = "README.md"
 exclude = ["/.github", "/benches", "/fuzz"]
 
+[features]
+default = ["std"]
+std = ["memchr/std", "simdutf8/std"]
+
 [dependencies]
-memchr = "2.7"
-simdutf8 = "0.1"
+memchr = { version = "2.7", default-features = false }
+simdutf8 = { version = "0.1", default-features = false }
 
 [dev-dependencies]
 base32 = "0.5"

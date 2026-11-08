@@ -29,8 +29,9 @@ use crate::{
     base64::{self, LineEnding},
     error::ToStr,
 };
+use alloc::{string::String, vec::Vec};
+use core::ops::Range;
 use memchr::{memchr2, memmem};
-use std::ops::Range;
 
 const BEGIN: &[u8] = b"-----BEGIN ";
 const END: &[u8] = b"-----END ";

@@ -14,7 +14,7 @@ use super::{
     LineShape,
 };
 use core::arch::aarch64::*;
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 const DECODE_BLOCK: usize = 64;
 const DECODE_BLOCK_OUT: usize = 48;

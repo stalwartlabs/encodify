@@ -12,7 +12,7 @@ use super::{
     kernel::scalar::NUMERAL_SYMBOLS,
 };
 use crate::{Buffer, Error};
-use std::{
+use core::{
     cmp::Ordering,
     fmt,
     hash::{Hash, Hasher},
@@ -126,7 +126,7 @@ impl U64Text {
         debug_assert!(bytes.is_ascii());
         // SAFETY: `Tables::numeral` fills `bytes` with alphabet symbols and
         // zero bytes, all ASCII and so valid UTF-8.
-        unsafe { std::str::from_utf8_unchecked(bytes) }
+        unsafe { core::str::from_utf8_unchecked(bytes) }
     }
 }
 
