@@ -5,7 +5,7 @@
  */
 
 use super::super::alphabet::Tables;
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 pub(crate) const NUMERAL_SYMBOLS: usize = 13;
 const PAIR_BITS: u64 = 0x3ff;

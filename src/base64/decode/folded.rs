@@ -15,6 +15,7 @@ use crate::{
     },
     buffer::SpareCapacity,
 };
+use alloc::vec::Vec;
 
 const GROWTH: usize = 4096;
 

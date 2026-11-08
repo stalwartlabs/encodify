@@ -11,7 +11,7 @@ use super::{
 };
 use crate::hex::{BLOCK_ROOM, EscapeTable, SPARSE_ESCAPES, SPARSE_LEN};
 use core::arch::aarch64::*;
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 const BLOCK: usize = 16;
 

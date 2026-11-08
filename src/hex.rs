@@ -36,7 +36,8 @@
 #![allow(unsafe_code)]
 
 use crate::{Buffer, Error};
-use std::{borrow::Cow, mem::MaybeUninit};
+use alloc::{borrow::Cow, string::String, vec::Vec};
+use core::mem::MaybeUninit;
 
 const INVALID: u8 = 0xff;
 
@@ -131,7 +132,7 @@ impl EscapeTable {
         while byte < 256 {
             let entry = &self.entries[byte];
             let (text, _) = entry.as_slice().split_at(entry[ENTRY_LEN] as usize);
-            strs[byte] = match std::str::from_utf8(text) {
+            strs[byte] = match core::str::from_utf8(text) {
                 Ok(text) => text,
                 Err(_) => "",
             };
@@ -514,7 +515,7 @@ mod tests {
         qp::tests::reference::{Digits, Failure, Hex},
         test_rng::{XorShift, scaled},
     };
-    use std::borrow::Cow;
+    use alloc::borrow::Cow;
 
     #[test]
     fn decodes_every_pair() {

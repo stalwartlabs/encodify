@@ -15,7 +15,8 @@ use crate::{
     Error,
     buffer::{SpareCapacity, Uninit},
 };
-use std::mem::MaybeUninit;
+use alloc::vec::Vec;
+use core::mem::MaybeUninit;
 
 const TAIL_BYTES: [usize; GROUP_SYMBOLS] = [0, 0, 1, 1, 2, 3, 3, 4];
 

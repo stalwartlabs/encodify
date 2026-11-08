@@ -6,7 +6,7 @@
 
 use super::Base64;
 use crate::{Buffer, Fold};
-use std::{convert::Infallible, mem::MaybeUninit};
+use core::{convert::Infallible, mem::MaybeUninit};
 
 const BUFFER: usize = 1024;
 

@@ -12,7 +12,7 @@ use crate::{
     },
     test_rng::{XorShift, lengths},
 };
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 type DecodeKernel = fn(&Tables, &[u8], &mut [MaybeUninit<u8>]) -> (usize, usize);
 type LinesKernel = fn(&Tables, LineShape, &[u8], &mut [MaybeUninit<u8>]) -> (usize, usize);

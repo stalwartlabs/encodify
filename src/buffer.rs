@@ -6,7 +6,8 @@
 
 #![allow(unsafe_code)]
 
-use std::mem::MaybeUninit;
+use alloc::{string::String, vec::Vec};
+use core::mem::MaybeUninit;
 
 /// A growable buffer that encoders append their output to.
 ///
@@ -19,7 +20,8 @@ impl Buffer for String {}
 
 pub(crate) mod sealed {
     use super::SpareCapacity;
-    use std::mem::MaybeUninit;
+    use alloc::{string::String, vec::Vec};
+    use core::mem::MaybeUninit;
 
     pub trait Sealed {
         /// The bytes of the buffer.
@@ -158,7 +160,7 @@ impl Uninit for [u8] {
     unsafe fn as_uninit(&mut self) -> &mut [MaybeUninit<u8>] {
         // SAFETY: `MaybeUninit<u8>` has the layout of `u8`, and our caller
         // writes only initialised values, so `self` stays initialised.
-        unsafe { &mut *(std::ptr::from_mut(self) as *mut [MaybeUninit<u8>]) }
+        unsafe { &mut *(core::ptr::from_mut(self) as *mut [MaybeUninit<u8>]) }
     }
 }
 
@@ -178,6 +180,6 @@ impl Initialized for [MaybeUninit<u8>] {
         let len = len.min(self.len());
         // SAFETY: `len` is clamped to the slice, `MaybeUninit<u8>` has the
         // layout of `u8`, and our caller guarantees those bytes are initialised.
-        unsafe { std::slice::from_raw_parts(self.as_ptr().cast(), len) }
+        unsafe { core::slice::from_raw_parts(self.as_ptr().cast(), len) }
     }
 }

@@ -198,11 +198,14 @@ fn encodes_through_every_sink() {
                 );
                 assert_eq!(engine.encoded_len_within(&input, short), None);
             }
-            let mut written = Vec::new();
-            engine
-                .encode_to_writer(&input, &mut written)
-                .expect("vec writer");
-            assert_eq!(written, expected, "{}", context());
+            #[cfg(feature = "std")]
+            {
+                let mut written = Vec::new();
+                engine
+                    .encode_to_writer(&input, &mut written)
+                    .expect("vec writer");
+                assert_eq!(written, expected, "{}", context());
+            }
             assert_eq!(engine.encoded_len(&input), expected.len());
             assert_eq!(
                 engine.encoded_len_within(&input, expected.len()),
@@ -238,11 +241,14 @@ fn encodes_large_inputs() {
                 let mut appended = vec![b'x'; 3];
                 engine.encode_append(&input, &mut appended);
                 assert!(appended.get(3..) == Some(expected.as_slice()));
-                let mut written = Vec::new();
-                engine
-                    .encode_to_writer(&input, &mut written)
-                    .expect("vec writer");
-                assert!(written == expected);
+                #[cfg(feature = "std")]
+                {
+                    let mut written = Vec::new();
+                    engine
+                        .encode_to_writer(&input, &mut written)
+                        .expect("vec writer");
+                    assert!(written == expected);
+                }
                 assert_eq!(engine.encoded_len(&input), expected.len());
                 assert_eq!(engine.encoded_len_within(&input, expected.len() / 2), None);
             }

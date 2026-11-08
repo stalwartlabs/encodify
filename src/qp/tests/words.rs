@@ -18,7 +18,7 @@ use crate::{
     },
     test_rng::{XorShift, scaled},
 };
-use std::borrow::Cow;
+use alloc::borrow::Cow;
 
 type Encoder = fn(&[u8]) -> Vec<u8>;
 
@@ -106,11 +106,14 @@ fn encodes_words_like_the_reference() {
                 );
                 assert_eq!(engine.encoded_len_within(&input, short), None);
             }
-            let mut written = Vec::new();
-            engine
-                .encode_to_writer(&input, &mut written)
-                .expect("vec writer");
-            assert_eq!(written, expected);
+            #[cfg(feature = "std")]
+            {
+                let mut written = Vec::new();
+                engine
+                    .encode_to_writer(&input, &mut written)
+                    .expect("vec writer");
+                assert_eq!(written, expected);
+            }
             assert_eq!(engine.encoded_len(&input), expected.len());
             assert_eq!(
                 engine.encoded_len_within(&input, expected.len()),
@@ -132,11 +135,14 @@ fn encodes_large_words() {
     let input = rng.bytes(40_000);
     for (engine, encode) in WORD_ENGINES {
         let expected = encode(&input);
-        let mut written = Vec::new();
-        engine
-            .encode_to_writer(&input, &mut written)
-            .expect("vec writer");
-        assert!(written == expected);
+        #[cfg(feature = "std")]
+        {
+            let mut written = Vec::new();
+            engine
+                .encode_to_writer(&input, &mut written)
+                .expect("vec writer");
+            assert!(written == expected);
+        }
         assert!(engine.encode(&input).as_bytes() == expected);
     }
 }

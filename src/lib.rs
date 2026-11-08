@@ -4,10 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  */
 #![doc = include_str!("../README.md")]
+#![cfg_attr(not(any(feature = "std", test)), no_std)]
+
+extern crate alloc;
 
 pub mod base32;
 pub mod base64;
 mod buffer;
+#[cfg(encodify_x86)]
+mod cpu;
 mod error;
 mod fold;
 pub mod hex;

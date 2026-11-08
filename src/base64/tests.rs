@@ -71,7 +71,7 @@ fn reference_lenient(engine: &Base64, input: &[u8]) -> Result<Vec<u8>, usize> {
 fn reference_wrapped(encoded: &str, width: usize, ending: &str) -> String {
     let mut out = String::new();
     for line in encoded.as_bytes().chunks(width) {
-        out.push_str(std::str::from_utf8(line).expect("ascii"));
+        out.push_str(core::str::from_utf8(line).expect("ascii"));
         out.push_str(ending);
     }
     out
@@ -110,11 +110,14 @@ fn encodes_like_the_base64_crate_for_every_length() {
                     })
                 );
             }
-            let mut written = Vec::new();
-            engine
-                .encode_to_writer(&input, &mut written)
-                .expect("vec writer");
-            assert_eq!(written, expected.as_bytes());
+            #[cfg(feature = "std")]
+            {
+                let mut written = Vec::new();
+                engine
+                    .encode_to_writer(&input, &mut written)
+                    .expect("vec writer");
+                assert_eq!(written, expected.as_bytes());
+            }
             assert_eq!(engine.display(&input).to_string(), expected);
         }
     }
@@ -127,18 +130,24 @@ fn encodes_large_inputs_through_every_sink() {
         let input = rng.bytes(len);
         let expected = reference_engine(&STANDARD).encode(&input);
         assert_eq!(STANDARD.encode(&input), expected);
-        let mut written = Vec::new();
-        STANDARD
-            .encode_to_writer(&input, &mut written)
-            .expect("vec writer");
-        assert_eq!(written, expected.as_bytes());
+        #[cfg(feature = "std")]
+        {
+            let mut written = Vec::new();
+            STANDARD
+                .encode_to_writer(&input, &mut written)
+                .expect("vec writer");
+            assert_eq!(written, expected.as_bytes());
+        }
         assert_eq!(STANDARD.display(&input).to_string(), expected);
         let wrapped = reference_wrapped(&expected, 76, "\r\n");
         assert_eq!(MIME.encode(&input), wrapped);
-        let mut written = Vec::new();
-        MIME.encode_to_writer(&input, &mut written)
-            .expect("vec writer");
-        assert_eq!(written, wrapped.as_bytes());
+        #[cfg(feature = "std")]
+        {
+            let mut written = Vec::new();
+            MIME.encode_to_writer(&input, &mut written)
+                .expect("vec writer");
+            assert_eq!(written, wrapped.as_bytes());
+        }
         assert_eq!(MIME.display(&input).to_string(), wrapped);
     }
 }
@@ -290,10 +299,10 @@ fn lenient_samples(rng: &mut XorShift, count: usize) -> Vec<Vec<u8>> {
         let encoded = STANDARD.encode(&raw).into_bytes();
         let mut text = match round % 4 {
             0 => encoded,
-            1 => reference_wrapped(std::str::from_utf8(&encoded).expect("ascii"), 76, "\r\n")
+            1 => reference_wrapped(core::str::from_utf8(&encoded).expect("ascii"), 76, "\r\n")
                 .into_bytes(),
             2 => reference_wrapped(
-                std::str::from_utf8(&encoded).expect("ascii"),
+                core::str::from_utf8(&encoded).expect("ascii"),
                 4 * (1 + rng.below(30)),
                 "\n",
             )

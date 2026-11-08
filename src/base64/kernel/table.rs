@@ -5,7 +5,7 @@
  */
 
 use super::super::alphabet::{TRIPLE_BITS, Tables};
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 const PAIR_BITS: u32 = 12;
 const PAIR_MASK: u64 = (1 << PAIR_BITS) - 1;

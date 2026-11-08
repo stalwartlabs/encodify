@@ -11,6 +11,7 @@ use crate::{
     base64::{Base64, alphabet::INVALID},
     buffer::SpareCapacity,
 };
+use alloc::vec::Vec;
 
 const CHUNK: usize = 4096;
 

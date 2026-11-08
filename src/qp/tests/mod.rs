@@ -187,7 +187,7 @@ impl Inputs for XorShift {
 
 #[test]
 fn every_kernel_runs() {
-    struct Names(std::cell::RefCell<Vec<&'static str>>);
+    struct Names(core::cell::RefCell<Vec<&'static str>>);
     impl Check for Names {
         fn check<K: Kernel>(&self, kernel: &'static str) {
             self.0.borrow_mut().push(kernel);

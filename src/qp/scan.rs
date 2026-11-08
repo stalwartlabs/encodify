@@ -11,8 +11,8 @@ use super::{
     tables::QpByte,
 };
 use crate::Error;
+use core::mem::MaybeUninit;
 use memchr::{memchr, memchr3_iter, memrchr};
-use std::mem::MaybeUninit;
 
 const CHUNK: usize = 4096;
 

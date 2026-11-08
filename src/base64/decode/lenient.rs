@@ -11,7 +11,7 @@ use crate::{
         kernel::{Break, LineShape},
     },
 };
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 pub(super) enum Halt {
     End,

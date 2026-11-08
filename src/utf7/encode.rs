@@ -6,7 +6,8 @@
 
 use super::{SHIFT_END, Utf7};
 use crate::Buffer;
-use std::mem::MaybeUninit;
+use alloc::{borrow::ToOwned, string::String};
+use core::mem::MaybeUninit;
 
 const BOUNDED_CAPACITY_LEN: usize = 64;
 

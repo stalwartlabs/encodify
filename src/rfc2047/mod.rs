@@ -36,9 +36,9 @@ mod encode;
 
 pub use encode::{B, MAX_WORD_LEN, Q_PHRASE, Q_TEXT, WordEncoder};
 
+use alloc::{borrow::Cow, string::String, vec::Vec};
 use memchr::{memchr_iter, memchr3};
 use simdutf8::basic::from_utf8;
-use std::borrow::Cow;
 
 /// The encoding of an encoded word.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -425,7 +425,7 @@ mod tests {
         utf8_charset,
     };
     use crate::{Error, qp};
-    use std::borrow::Cow;
+    use alloc::borrow::Cow;
 
     fn latin1(charset: &[u8], bytes: &[u8], out: &mut String) {
         if charset.eq_ignore_ascii_case(b"iso-8859-1") {

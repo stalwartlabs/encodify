@@ -10,7 +10,7 @@ use crate::{
     qp::{BINARY, BODY, DKIM, Q_PHRASE, Q_TEXT, QuotedPrintable},
     test_rng::{XorShift, scaled},
 };
-use std::borrow::Cow;
+use alloc::borrow::Cow;
 
 const ENGINES: [QuotedPrintable; 7] = [
     BODY,

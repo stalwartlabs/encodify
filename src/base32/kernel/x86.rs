@@ -11,7 +11,7 @@ use super::super::alphabet::{Nibbles, Tables};
 use core::arch::x86::*;
 #[cfg(target_arch = "x86_64")]
 use core::arch::x86_64::*;
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 const ENCODE_STEP: usize = 10;
 const ENCODE_STEP_OUT: usize = 16;

@@ -8,7 +8,7 @@
 
 use super::{Mode, QuotedPrintable, tables::MAX_CONTENT};
 use crate::{Buffer, Fold, buffer::Initialized, hex::BLOCK_ROOM};
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 const BUFFER: usize = 1024;
 

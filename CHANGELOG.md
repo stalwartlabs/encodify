@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- `no_std` support with `alloc`, behind a default `std` feature.
+
 ## [1.0.2] - 2026-10-02
 
 ### Added

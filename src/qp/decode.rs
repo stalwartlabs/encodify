@@ -17,8 +17,9 @@ use crate::{
     buffer::{SpareCapacity, Uninit},
     hex::decode_pair,
 };
+use alloc::{borrow::Cow, vec::Vec};
+use core::mem::MaybeUninit;
 use memchr::{memchr, memchr3};
-use std::{borrow::Cow, mem::MaybeUninit};
 
 pub(super) const SLACK: usize = 64;
 

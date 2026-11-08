@@ -14,7 +14,7 @@ use crate::hex::{BLOCK_ROOM, EscapeTable, SPARSE_ESCAPES, SPARSE_LEN};
 use core::arch::x86::*;
 #[cfg(target_arch = "x86_64")]
 use core::arch::x86_64::*;
-use std::mem::MaybeUninit;
+use core::mem::MaybeUninit;
 
 const NARROW: usize = 16;
 const WIDE: usize = 32;

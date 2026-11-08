@@ -8,7 +8,8 @@
 
 use super::{Base32, alphabet::Tables};
 use crate::{Buffer, Error, buffer::Uninit};
-use std::mem::MaybeUninit;
+use alloc::string::String;
+use core::mem::MaybeUninit;
 
 pub(super) const GROUP: usize = 5;
 pub(super) const GROUP_SYMBOLS: usize = 8;
@@ -85,7 +86,7 @@ impl Base32 {
         debug_assert!(text.is_ascii());
         // SAFETY: `encode_into_slice` just wrote these `written` bytes, all
         // alphabet symbols or `=`, so they are ASCII and valid UTF-8.
-        Ok(unsafe { std::str::from_utf8_unchecked(text) })
+        Ok(unsafe { core::str::from_utf8_unchecked(text) })
     }
 
     #[inline(always)]

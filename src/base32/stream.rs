@@ -12,7 +12,9 @@ use super::{
     encode::{GROUP, GROUP_SYMBOLS, TAIL_SYMBOLS},
 };
 use crate::Buffer;
-use std::{fmt, io, iter::FusedIterator, mem::MaybeUninit, slice};
+use core::{fmt, iter::FusedIterator, mem::MaybeUninit, slice};
+#[cfg(feature = "std")]
+use std::io;
 
 const BYTE_BITS: u32 = 8;
 const SYMBOL_BITS: u32 = 5;
@@ -53,6 +55,7 @@ impl Base32 {
 /// [`Encoder::finish`] or when the encoder is dropped. Writes never fail.
 ///
 /// ```
+/// # #[cfg(feature = "std")] {
 /// use encodify::base32;
 /// use std::io::Write;
 ///
@@ -62,6 +65,7 @@ impl Base32 {
 /// encoder.write_all(b"secret")?;
 /// encoder.finish();
 /// assert_eq!(key, "app_aaaaakttmvrxezlu");
+/// # }
 /// # Ok::<(), std::io::Error>(())
 /// ```
 pub struct Encoder<'x, B: Buffer> {
@@ -73,7 +77,7 @@ pub struct Encoder<'x, B: Buffer> {
 }
 
 impl<B: Buffer> Encoder<'_, B> {
-    /// Encodes `input`: the infallible form of [`io::Write::write_all`].
+    /// Encodes `input`: the infallible form of `io::Write::write_all`.
     #[inline]
     pub fn push(&mut self, input: &[u8]) {
         if self.count + input.len() < GROUP {
@@ -153,6 +157,7 @@ impl<B: Buffer> Encoder<'_, B> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<B: Buffer> io::Write for Encoder<'_, B> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {

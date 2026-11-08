@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  */
 
-use std::fmt;
+use core::fmt;
 
 /// Error returned by the decoders and by the encoders that write into a
 /// caller-provided slice.
@@ -104,7 +104,7 @@ impl fmt::Display for Error {
     }
 }
 
-impl std::error::Error for Error {}
+impl core::error::Error for Error {}
 
 pub(crate) trait ToStr {
     /// Validates the bytes as UTF-8.

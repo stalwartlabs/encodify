@@ -13,15 +13,18 @@ use super::{
     output::Output,
     tables::{BLANK, CLASS, CR, ESCAPED, HARD_BREAK, LF, MAX_CONTENT, PLAIN, QpByte, SOFT_BREAK},
 };
-use crate::{
-    Buffer, Error,
-    buffer::{Initialized, Uninit},
-};
-use std::{io, mem::MaybeUninit};
+#[cfg(feature = "std")]
+use crate::buffer::Initialized;
+use crate::{Buffer, Error, buffer::Uninit};
+use alloc::string::String;
+use core::mem::MaybeUninit;
+#[cfg(feature = "std")]
+use std::io;
 
 const SLACK: usize = 64;
 const ESTIMATE_MARGIN: usize = 16;
 const REST_MARGIN: usize = 8;
+#[cfg(feature = "std")]
 const WRITER_CHUNK: usize = 8 * 1024;
 
 impl QuotedPrintable {
@@ -75,6 +78,7 @@ impl QuotedPrintable {
 
     /// Writes the encoding of `input` to `writer` in chunks, without
     /// allocating.
+    #[cfg(feature = "std")]
     pub fn encode_to_writer(
         &self,
         input: impl AsRef<[u8]>,
