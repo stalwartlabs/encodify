@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.3]
+
+### Fixed
+- RFC 2047: joining adjacent ISO-2022-JP encoded words no longer leaves an empty designation (`ESC ( B` followed by `ESC $ B`) that decoders replace with U+FFFD.
+
 ## [1.0.2] - 2026-10-02
 
 ### Added

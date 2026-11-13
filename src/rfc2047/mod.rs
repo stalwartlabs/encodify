@@ -63,6 +63,7 @@ pub struct EncodedWord<'x> {
 
 const MAX_WORD: usize = 998;
 const TERMINATOR: &[u8] = b"?=";
+const ESC: u8 = 0x1b;
 
 impl<'x> EncodedWord<'x> {
     /// Parses the encoded word at the start of `input`. Returns the word and
@@ -294,8 +295,16 @@ impl<'x, 'o, F: FnMut(&[u8], &[u8], &mut String)> TextDecoder<'x, 'o, F> {
         {
             self.flush();
         }
+        let joint = self.pending.len();
         if word.decode_append(self.pending).is_err() {
             return false;
+        }
+        if let Some((
+            [kept @ .., ESC, b'(', _],
+            [ESC, b'(', ..] | [ESC, b'$', b'@' | b'A' | b'B' | b'(', ..],
+        )) = self.pending.split_at_checked(joint)
+        {
+            self.pending.drain(kept.len()..joint);
         }
         self.pending_charset = Some(word.charset);
         self.last_was_word = true;
@@ -520,6 +529,46 @@ mod tests {
         ] {
             assert_eq!(
                 decode_text(input, latin1),
+                expected,
+                "{:?}",
+                String::from_utf8_lossy(input)
+            );
+        }
+    }
+
+    #[test]
+    fn joins_iso_2022_words_without_empty_designations() {
+        let raw = |_: &[u8], bytes: &[u8], out: &mut String| {
+            out.extend(bytes.iter().map(|&byte| char::from(byte)));
+        };
+        for (input, expected) in [
+            (
+                &b"=?ISO-2022-JP?B?GyRCJCIbKEI=?=\r\n =?ISO-2022-JP?B?GyRCJCQbKEI=?="[..],
+                "\x1b$B$\"\x1b$B$$\x1b(B",
+            ),
+            (
+                b"=?iso-2022-jp?q?=1B$B$=22=1B(J?= =?ISO-2022-JP?q?=1B(Ba?=",
+                "\x1b$B$\"\x1b(Ba",
+            ),
+            (
+                b"=?iso-2022-jp?q?=1B$B$?= =?iso-2022-jp?q?=22=1B(B?=",
+                "\x1b$B$\"\x1b(B",
+            ),
+            (
+                b"=?iso-2022-jp?q?=1B$B$=22=1B(B?= =?iso-2022-jp?q?a=1B$B$$=1B(B?=",
+                "\x1b$B$\"\x1b(Ba\x1b$B$$\x1b(B",
+            ),
+            (
+                b"=?iso-2022-jp-2?q?=1B$B$=22=1B(B?= =?iso-2022-jp-2?q?=1B.A=1BNa?=",
+                "\x1b$B$\"\x1b(B\x1b.A\x1bNa",
+            ),
+            (
+                b"=?iso-2022-jp?q?=1B$B$=22=1B(B?= =?utf-8?q?=1B$B?=",
+                "\x1b$B$\"\x1b(B\x1b$B",
+            ),
+        ] {
+            assert_eq!(
+                decode_text(input, raw),
                 expected,
                 "{:?}",
                 String::from_utf8_lossy(input)
